@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Конвертер валют</title>
+    <style>
+        body { font-family: sans-serif; display: flex; justify-content: center; margin-top: 50px; background: #f4f4f9; }
+        .container { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        input, select, button { margin: 10px 0; padding: 10px; width: 100%; box-sizing: border-box; }
+        button { background: #007bff; color: white; border: none; cursor: pointer; }
+        button:hover { background: #0056b3; }
+        .result { font-weight: bold; color: #28a745; text-align: center; font-size: 1.2em; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Конвертер валют</h2>
+        <form method="POST">
+            <input type="number" name="amount" step="0.01" placeholder="Сумма" value="{{ amount or '' }}" required>
+            <select name="base">
+                <option value="USD" {% if base == 'USD' %}selected{% endif %}>USD</option>
+                <option value="EUR" {% if base == 'EUR' %}selected{% endif %}>EUR</option>
+                <option value="RUB" {% if base == 'RUB' %}selected{% endif %}>RUB</option>
+            </select>
+            <select name="target">
+                <option value="RUB" {% if target == 'RUB' %}selected{% endif %}>RUB</option>
+                <option value="USD" {% if target == 'USD' %}selected{% endif %}>USD</option>
+                <option value="EUR" {% if target == 'EUR' %}selected{% endif %}>EUR</option>
+            </select>
+            <button type="submit">Конвертировать</button>
+        </form>
+
+        {% if result %}
+            <div class="result">
+                {{ amount }} {{ base }} = {{ result }} {{ target }}
+            </div>
+        {% endif %}
+
+        {% if error %}
+            <div style="color: red;">{{ error }}</div>
+        {% endif %}
+    </div>
+</body>
+</html>

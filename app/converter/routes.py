@@ -1,28 +1,35 @@
 # организация обработки запросов
 
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, jsonify, request, render_template
 from .utils import get_exchange_rate
 
 converter_bp = Blueprint('converter', __name__)
 
+@converter_bp.route('/', methods=['GET', 'POST'])
+def index():
+    result = None
+    error = None
+    base = 'USD'
+    target = 'RUB'
+    amount = None
 
-@converter_bp.route('/convert', methods=['GET'])
-def convert():
-    base = request.args.get('from', 'USD').upper()
-    target = request.args.get('to', 'RUB').upper()
-    amount = float(request.args.get('amount', 1))
+    if request.method == 'POST':
+        try:
+            base = request.form.get('base').upper()
+            target = request.form.get('target').upper()
+            amount = float(request.form.get('amount'))
 
-    rate = get_exchange_rate(base, target)
+            rate = get_exchange_rate(base, target)
+            if rate:
+                result = round(amount * rate, 2)
+            else:
+                error = "Не удалось получить курс валют."
+        except (ValueError, TypeError):
+            error = "Введите корректное число."
 
-    if rate:
-        result = amount * rate
-        return jsonify({
-            'status': 'success',
-            'base': base,
-            'target': target,
-            'amount': amount,
-            'rate': rate,
-            'result': round(result, 2)
-        })
-
-    return jsonify({'status': 'error', 'message': 'Rate not found'}), 400
+    return render_template('index.html',
+                           result=result,
+                           error=error,
+                           base=base,
+                           target=target,
+                           amount=amount)
